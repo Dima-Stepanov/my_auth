@@ -7,4 +7,5 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
     <include file="001_ddl_create_persons_table.sql" relativeToChangelogFile="true"/>
     <include file="002_dml_insert_persons_table.sql" relativeToChangelogFile="true"/>
+    <include file="003_ddl_crate_users_table.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
