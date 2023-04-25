@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.job4j.auth.service.UserService;
 
+import java.util.Collections;
+
 /**
  * 3. Мидл
  * 3.4. Spring
@@ -31,6 +33,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         user.orElseThrow(() -> new UsernameNotFoundException(username));
         return new User(user.get().getUsername(),
                 user.get().getPassword(),
-                user.get().getAuthorities());
+                Collections.emptyList());
     }
 }

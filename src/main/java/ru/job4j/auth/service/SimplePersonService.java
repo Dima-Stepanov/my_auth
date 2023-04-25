@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.job4j.auth.domain.Person;
 import ru.job4j.auth.repository.PersonRepository;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -33,6 +36,38 @@ public class SimplePersonService implements PersonService {
             log.error("Person save error: {}", e.getMessage());
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<Person> updatePatch(Person person) throws InvocationTargetException, IllegalAccessException {
+        var currentPerson = personRepository.findById(person.getId());
+        if (currentPerson.isEmpty()) {
+            throw new NullPointerException("Person id: " + person.getId() + " , not found");
+        }
+        var methods = currentPerson.get().getClass().getDeclaredMethods();
+        var namePerMethod = new HashMap<String, Method>();
+        for (var method : methods) {
+            String name = method.getName();
+            if (name.startsWith("get") || name.startsWith("set")) {
+                namePerMethod.put(name, method);
+            }
+        }
+        for (var name : namePerMethod.keySet()) {
+            if (name.startsWith("get")) {
+                Method getMethod = namePerMethod.get(name);
+                Method setMethod = namePerMethod.get(name.replace("get", "set"));
+                if (setMethod == null) {
+                    return Optional.empty();
+                }
+
+                Object newValue = getMethod.invoke(person);
+                if (newValue != null) {
+                    setMethod.invoke(currentPerson.get(), newValue);
+                }
+            }
+        }
+        personRepository.save(currentPerson.get());
+        return currentPerson;
     }
 
     @Override

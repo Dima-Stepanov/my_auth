@@ -2,6 +2,7 @@ package ru.job4j.auth.service;
 
 import ru.job4j.auth.domain.Person;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 /**
@@ -18,6 +19,8 @@ public interface PersonService {
     Optional<Person> save(Person person);
 
     Optional<Person> findById(int personId);
+
+    Optional<Person> updatePatch(Person person) throws InvocationTargetException, IllegalAccessException;
 
     void update(Person person);
 

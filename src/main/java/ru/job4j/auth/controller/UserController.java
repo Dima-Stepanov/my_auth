@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.job4j.auth.domain.User;
+import ru.job4j.auth.domain.SimpleUser;
 import ru.job4j.auth.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import java.util.HashMap;
  * 3.4.6. Rest
  * 3. Авторизация JWT [#9146]
  * 5. Обработка исключений и Spring REST [#504797]
- * UserController REST API контроллер модели User.
+ * UserController REST API контроллер модели SimpleUser.
  *
  * @author Dmitry Stepanov, user Dmitry
  * @since 24.04.2023
@@ -36,34 +37,42 @@ public class UserController {
     private static final int SIZE_PASS = 2;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<User> signUp(@RequestBody User user) {
-        if (user == null || user.getUsername() == null || user.getPassword() == null) {
+    public ResponseEntity<SimpleUser> signUp(@RequestBody SimpleUser simpleUser) {
+        if (simpleUser == null || simpleUser.getUsername() == null || simpleUser.getPassword() == null) {
             throw new NullPointerException("Username and password mustn't be empty");
         }
-        if (user.getPassword().length() < SIZE_PASS || user.getPassword().isEmpty() || user.getPassword().isBlank()) {
+        if (simpleUser.getPassword().length() < SIZE_PASS || simpleUser.getPassword().isEmpty() || simpleUser.getPassword().isBlank()) {
             throw new IllegalArgumentException(
                     "Invalid password. Password length must be more than 2 characters.");
         }
         return new ResponseEntity<>(
-                this.users.save(user).orElseThrow(
+                this.users.save(simpleUser).orElseThrow(
                         () -> new ResponseStatusException(
                                 HttpStatus.INTERNAL_SERVER_ERROR,
-                                "The user has not been saved, the username is already taken"
+                                "The simpleUser has not been saved, the username is already taken"
                         )
                 ),
                 HttpStatus.CREATED
         );
     }
 
+    @PatchMapping("/")
+    public SimpleUser updatePatch(@RequestBody SimpleUser simpleUser) throws Exception {
+        var updateUser = users.updatePatch(simpleUser);
+        return updateUser.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
+        );
+    }
+
     @GetMapping("/all")
-    public Iterable<User> findAll() {
+    public Iterable<SimpleUser> findAll() {
         return this.users.findAllUsers();
     }
 
     @ExceptionHandler(value = {IllegalArgumentException.class})
     public void exceptionHandler(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(new HashMap<>() {{
             put("message", e.getMessage());
             put("type", e.getClass());

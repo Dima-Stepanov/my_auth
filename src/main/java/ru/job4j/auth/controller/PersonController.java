@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.auth.domain.Person;
+import ru.job4j.auth.domain.SimpleUser;
 import ru.job4j.auth.service.SimplePersonService;
 
 /**
@@ -58,6 +59,14 @@ public class PersonController {
                         )
                 ),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PatchMapping("/")
+    public Person updatePatch(@RequestBody Person person) throws Exception {
+        var updateUser = persons.updatePatch(person);
+        return updateUser.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
         );
     }
 

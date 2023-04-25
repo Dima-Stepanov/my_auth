@@ -1,7 +1,7 @@
 package ru.job4j.auth.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import ru.job4j.auth.domain.User;
+import ru.job4j.auth.domain.SimpleUser;
 
 import java.util.Optional;
 
@@ -15,6 +15,6 @@ import java.util.Optional;
  * @author Dmitry Stepanov, user Dmitry
  * @since 24.04.2023
  */
-public interface UserRepository extends CrudRepository<User, Integer> {
-    Optional<User> findUserByUsername(String username);
+public interface UserRepository extends CrudRepository<SimpleUser, Integer> {
+    Optional<SimpleUser> findUserByUsername(String username);
 }
