@@ -25,8 +25,14 @@ public class SimplePersonService implements PersonService {
     private final PersonRepository personRepository;
 
     @Override
-    public Person save(Person person) {
-        return personRepository.save(person);
+    public Optional<Person> save(Person person) {
+        try {
+            personRepository.save(person);
+            return Optional.of(person);
+        } catch (Exception e) {
+            log.error("Person save error: {}", e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override

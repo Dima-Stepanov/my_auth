@@ -15,7 +15,7 @@ import java.util.Optional;
  * @since 24.04.2023
  */
 public interface PersonService {
-    Person save(Person person);
+    Optional<Person> save(Person person);
 
     Optional<Person> findById(int personId);
 
