@@ -38,8 +38,7 @@ public class SimpleUser {
     private String username;
     @EqualsAndHashCode.Include
     @Column(nullable = false)
-    @NotNull(message = "Password must be non null", groups = {Operation.OnCreate.class})
-    @Size(min = 4, max = 8, message = "Password must be more 4 and less 6")
+    @Min(value = 4, message = "Password must be more 4", groups = {Operation.OnCreate.class})
     private String password;
     private boolean enabled = true;
 
