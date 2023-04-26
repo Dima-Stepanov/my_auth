@@ -3,11 +3,14 @@ package ru.job4j.auth.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.auth.domain.Person;
-import ru.job4j.auth.domain.SimpleUser;
+import ru.job4j.auth.handlers.Operation;
 import ru.job4j.auth.service.SimplePersonService;
+
+import javax.validation.Valid;
 
 /**
  * 3. Мидл
@@ -46,7 +49,8 @@ public class PersonController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Person> create(@RequestBody Person person) {
+    @Validated(Operation.OnCreate.class)
+    public ResponseEntity<Person> create(@Valid @RequestBody Person person) {
         if (person == null || person.getLogin() == null || person.getPassword() == null) {
             throw new NullPointerException("Person login and password mustn't be empty");
         }
@@ -63,7 +67,8 @@ public class PersonController {
     }
 
     @PatchMapping("/")
-    public Person updatePatch(@RequestBody Person person) throws Exception {
+    @Validated(Operation.OnUpdate.class)
+    public Person updatePatch(@Valid @RequestBody Person person) throws Exception {
         var updateUser = persons.updatePatch(person);
         return updateUser.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
@@ -71,7 +76,8 @@ public class PersonController {
     }
 
     @PutMapping("/")
-    public ResponseEntity<Void> update(@RequestBody Person person) {
+    @Validated(Operation.OnUpdate.class)
+    public ResponseEntity<Void> update(@Valid @RequestBody Person person) {
         this.persons.update(person);
         return ResponseEntity.ok().build();
     }

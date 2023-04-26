@@ -6,13 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.auth.domain.SimpleUser;
+import ru.job4j.auth.handlers.Operation;
 import ru.job4j.auth.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -37,7 +40,8 @@ public class UserController {
     private static final int SIZE_PASS = 2;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<SimpleUser> signUp(@RequestBody SimpleUser simpleUser) {
+    @Validated(Operation.OnCreate.class)
+    public ResponseEntity<SimpleUser> signUp(@Valid @RequestBody SimpleUser simpleUser) {
         if (simpleUser == null || simpleUser.getUsername() == null || simpleUser.getPassword() == null) {
             throw new NullPointerException("Username and password mustn't be empty");
         }
@@ -57,7 +61,8 @@ public class UserController {
     }
 
     @PatchMapping("/")
-    public SimpleUser updatePatch(@RequestBody SimpleUser simpleUser) throws Exception {
+    @Validated(Operation.OnUpdate.class)
+    public SimpleUser updatePatch(@Valid @RequestBody SimpleUser simpleUser) throws Exception {
         var updateUser = users.updatePatch(simpleUser);
         return updateUser.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST)
